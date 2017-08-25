@@ -14,6 +14,8 @@ RUN git clone https://github.com/azkaban/azkaban.git && cd azkaban \
     && mkdir -p /opt/azkaban-exec-server/conf /opt/azkaban-exec-server/extlib  /opt/azkaban-exec-server/logs\
     && cd .. \
     && rm -r azkaban \
+    && rm -r /root/.gradle \
+    && rm -r /root/.npm \
     && apt-get clean \
     && rm -rf \
     /var/lib/apt/lists/* \
@@ -21,7 +23,7 @@ RUN git clone https://github.com/azkaban/azkaban.git && cd azkaban \
     /var/tmp/* \
     /usr/share/man \
     /usr/share/doc \
-    /usr/share/doc-base
+    /usr/share/doc-base 
 
 EXPOSE 12321
 
