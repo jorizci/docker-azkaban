@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: azkaban-executor-service
+  labels:
+    app: azkaban
+spec:
+  ports:
+    - port: 12321
+  selector:
+    app: azkaban
+    tier: executor
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: azkaban-executor-deployment
+  labels:
+    app: azkaban
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: azkaban
+        tier: executor
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - image: jorizci/azkaban-executor:latest
+        name: azkaban-executor
+        ports:
+        - containerPort: 12321
+        volumeMounts:
+        - mountPath: /opt/azkaban-exec-server/conf/azkaban.properties
+          name: azkaban-config
+          subPath: azkaban.properties
+      volumes:
+      - name: azkaban-config
+        configMap:
+          name: azkaban-executor.properties
+          items:
+          - key: azkaban-executor.properties
+            path: azkaban.properties
+
