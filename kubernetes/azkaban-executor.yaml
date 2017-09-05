@@ -7,36 +7,42 @@ metadata:
 spec:
   ports:
     - port: 12321
+  clusterIP: None
   selector:
     app: azkaban
     tier: executor
 ---
 apiVersion: apps/v1beta1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: azkaban-executor-deployment
   labels:
     app: azkaban
 spec:
-  strategy:
-    type: Recreate
+  serviceName: "azkaban-executor-service"
+  updateStrategy:
+    type: RollingUpdate
+  replicas: 2
   template:
     metadata:
       labels:
         app: azkaban
         tier: executor
     spec:
-      hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       containers:
-      - image: jorizci/azkaban-executor:latest
+      - image: jorizci/azkaban-executor-t2d:3.30.1
         name: azkaban-executor
+        imagePullPolicy: Always
         ports:
         - containerPort: 12321
         volumeMounts:
         - mountPath: /opt/azkaban-exec-server/conf/azkaban.properties
           name: azkaban-config
           subPath: azkaban.properties
+        - mountPath: /mnt/externalData
+          name: azkaban-work
+          subPath: externalData
       volumes:
       - name: azkaban-config
         configMap:
@@ -44,4 +50,6 @@ spec:
           items:
           - key: azkaban-executor.properties
             path: azkaban.properties
-
+      - name: azkaban-work
+        persistentVolumeClaim:
+          claimName: nfs-azkaban-work-pvc

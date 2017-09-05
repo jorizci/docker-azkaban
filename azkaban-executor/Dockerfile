@@ -6,16 +6,15 @@ ENV AZKABAN_VERSION=3.30.1
 RUN git clone https://github.com/azkaban/azkaban.git && cd azkaban \
     && git checkout tags/$AZKABAN_VERSION \
     && ./gradlew distZip \
-    && pwd \
-    && ls -la \
     && unzip /azkaban/azkaban-exec-server/build/distributions/azkaban-exec-server-${AZKABAN_VERSION}.zip -d /opt \
-    && ln -s /opt/azkaban-exec-server-${AZKABAN_VERSION} /opt/azkaban-exec-server \
+    && mv /opt/azkaban-exec-server-${AZKABAN_VERSION} /opt/azkaban-exec-server \
     && sed -i "s/&//" /opt/azkaban-exec-server/bin/azkaban-executor-start.sh \
+    && sed -i "s/ &//" /opt/azkaban-exec-server/bin/start-exec.sh \
     && mkdir -p /opt/azkaban-exec-server/conf /opt/azkaban-exec-server/extlib  /opt/azkaban-exec-server/logs\
     && cd .. \
-    && rm -r azkaban \
-    && rm -r /root/.gradle \
-    && rm -r /root/.npm \
+    && rm -rf azkaban \
+    && rm -rf /root/.gradle \
+    && rm -rf /root/.npm \
     && apt-get clean \
     && rm -rf \
     /var/lib/apt/lists/* \
@@ -32,4 +31,4 @@ ADD plugins/ /opt/azkaban-exec-server/plugins/
 
 WORKDIR /opt/azkaban-exec-server
 
-ENTRYPOINT [ "./bin/azkaban-executor-start.sh" ]
+ENTRYPOINT [ "./bin/start-exec.sh" ]

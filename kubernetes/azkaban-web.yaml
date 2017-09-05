@@ -33,6 +33,7 @@ spec:
       containers:
       - image: jorizci/azkaban-web:latest
         name: azkaban-web
+        imagePullPolicy: Always
         ports:
         - containerPort: 8443
           name: azkaban-web

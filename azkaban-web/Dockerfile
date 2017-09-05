@@ -7,11 +7,13 @@ RUN git clone https://github.com/azkaban/azkaban.git && cd azkaban \
     && git checkout tags/$AZKABAN_VERSION \
     && ./gradlew distZip \
     && unzip /azkaban/azkaban-web-server/build/distributions/azkaban-web-server-${AZKABAN_VERSION}.zip -d /opt \
-    && ln -s /opt/azkaban-web-server-${AZKABAN_VERSION} /opt/azkaban-web-server \
+    && mv /opt/azkaban-web-server-${AZKABAN_VERSION} /opt/azkaban-web-server \
     && sed -i "s/&//" /opt/azkaban-web-server/bin/azkaban-web-start.sh \
     && mkdir -p /opt/azkaban-web-server/conf /opt/azkaban-web-server/extlib  /opt/azkaban-web-server/logs\
     && cd .. \
-    && rm -r azkaban \
+    && rm -rf azkaban \
+    && rm -rf /root/.gradle \
+    && rm -rf /root/.npm \
     && apt-get clean \
     && rm -rf \
     /var/lib/apt/lists/* \
